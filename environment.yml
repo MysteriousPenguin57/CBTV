@@ -1,0 +1,18 @@
+# Conda (or mamba) environment for CBTV, CPU only.
+#   conda env create -f environment.yml        (or: mamba env create -f environment.yml)
+#   conda activate cbtv
+#   pip install --no-deps .                    (from this folder; add -e for an editable install)
+# For a GPU, add CuPy afterwards: pip install cupy-cuda12x (see docs/install.md).
+# To reproduce the paper's numbers exactly, use requirements-lock.txt instead (docs/install.md).
+name: cbtv
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - numpy>=2,<3
+  - scipy
+  - scikit-image
+  - tqdm
+  - pip:
+      - opencv-python>=4.10,<6

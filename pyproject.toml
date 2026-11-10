@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cbtv"
+version = "1.0.0"
+description = "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
+readme = "README.md"
+license = { text = "BSD-3-Clause" }
+authors = [{ name = "Kaveeshan Thurairajah", email = "kavee@thurairajah.org" }]
+requires-python = ">=3.10"
+# Core = everything the shipped presets import (csv, ws_multi_vote, bayes_adapt).
+# scikit-image: peak_local_max (cbtv/detect/gpu_strategies.py) and blob_log (cbtv/log_detect.py).
+dependencies = [
+    "numpy>=2,<3",
+    "scipy",
+    "opencv-python>=4.10,<6",
+    "scikit-image",
+    "tqdm",
+]
+
+[project.urls]
+Homepage = "https://github.com/MysteriousPenguin57/CBTV"
+Documentation = "https://github.com/MysteriousPenguin57/CBTV/tree/main/docs"
+Issues = "https://github.com/MysteriousPenguin57/CBTV/issues"
+
+[project.optional-dependencies]
+gpu = ["cupy-cuda12x"]
+cellpose = ["cellpose"]
+# test suite deps: tests/ and tools/ import pandas; tests/test_cli_robustness.py uses hypothesis
+test = ["pytest", "pandas", "hypothesis"]
+# cbtv.track() returns a pandas.DataFrame; optional so the core install and `import cbtv` stay
+# pandas-free - track() says `pip install "cbtv[api]"` when it is missing
+api = ["pandas"]
+
+[project.scripts]
+cbtv = "run_cbtv:main"
+cptv = "run_cbtv:main_cptv_alias"  # former name; prints a one-line deprecation note
+
+[tool.setuptools]
+packages = ["cbtv", "cbtv.detect"]
+py-modules = [
+    "run_cbtv",
+    "cbtv_clean",
+    "render_states",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["site", "tutorial_out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = [
+    "E701", "E702",  # compound statements (`if x: y`, `a; b`): the codebase's compact house style, not a defect
+    "B007",          # unused loop variables: renaming tuple-unpacking targets in legacy loops is churn only
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Legacy files with long lines: wrapping them is churn; new files are held to 120.
+"cbtv/clusters.py" = ["E501"]
+"cbtv/config.py" = ["E501"]
+"cbtv/cost_matrix.py" = ["E501"]
+"cbtv/detect/strategies.py" = ["E501"]
+"cbtv/detection.py" = ["E501"]
+"cbtv/detection_filter.py" = ["E501"]
+"cbtv/exemplars.py" = ["E501"]
+"cbtv/kernels.py" = ["E501"]
+"cbtv/log_detect.py" = ["E501"]
+"cbtv/run_tracker.py" = ["E501"]
+"tests/test_bt.py" = ["E501"]
+"tools/golden/diff_tracks.py" = ["E501"]
+"tools/parity/diff_dumps.py" = ["E501"]
+"tools/parity/diff_tracks.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+follow_imports = "silent"
+check_untyped_defs = false
+warn_unused_ignores = false
+files = ["cbtv", "run_cbtv.py", "cbtv_clean.py", "render_states.py", "baselines", "tools/realdata"]

@@ -1,0 +1,56 @@
+site_name: CBTV
+site_description: "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
+repo_url: https://github.com/MysteriousPenguin57/CBTV
+edit_uri: ""
+docs_dir: docs
+strict: true
+theme:
+  name: material
+  features: [navigation.sections, content.code.copy]
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/brightness-7, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/brightness-4, name: Light mode}
+hooks:
+  - tools/docs/hooks.py
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.superfences
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: google
+            docstring_options:
+              warn_missing_types: false
+              warnings: false   # grouped params ("x, y, r: ...") in cbtv/bayes.py, cbtv/detectors.py
+            show_source: false
+            show_root_heading: true
+            members_order: source
+            filters: ["!^_"]
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - User guide: user_guide.md
+  - 5-minute tutorial: tutorial_fixture.md
+  - Python API (cbtv.track): api_python.md
+  - Module map: api.md
+  - API reference:
+      - run_cbtv (the cbtv command): reference/run_cbtv.md
+      - cbtv package: reference/cbtv.md
+  - README: project-readme.md
+  - Changelog: CHANGELOG.md
+  - Contributing: CONTRIBUTING.md
+  - Code of conduct: CODE_OF_CONDUCT.md

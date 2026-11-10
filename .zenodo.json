@@ -1,0 +1,27 @@
+{
+  "title": "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows",
+  "version": "1.0.0",
+  "upload_type": "software",
+  "description": "CBTV (Colour Bean Tracking Velocimetry) tracks multicoloured particles in dense granular flows from video. It first matches constellations of neighbouring coloured particles as single units, guided by a motion prior measured by cross-correlation for slow particles and extrapolated from each track's history for fast ones, and then assigns the remaining particles individually. It runs on CPU or GPU and needs no training data.",
+  "creators": [
+    {
+      "name": "Thurairajah, Kaveeshan",
+      "affiliation": "University of Waterloo"
+    }
+  ],
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "particle tracking velocimetry",
+    "granular flow",
+    "colour identification",
+    "multi-object tracking"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/MysteriousPenguin57/CBTV",
+      "relation": "isSupplementTo",
+      "scheme": "url",
+      "resource_type": "software"
+    }
+  ]
+}

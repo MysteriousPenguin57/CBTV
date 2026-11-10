@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use CBTV, please cite the paper below and the version of the software you used."
+title: "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
+type: software
+authors:
+  - family-names: Thurairajah
+    given-names: Kaveeshan
+    email: kavee@thurairajah.org
+    affiliation: "University of Waterloo"
+version: 1.0.0
+# TODO(release): replace with the Zenodo DOI minted for the v1.0.0 release.
+doi: 10.5281/zenodo.XXXXXXX
+license: BSD-3-Clause
+repository-code: "https://github.com/MysteriousPenguin57/CBTV"
+keywords:
+  - particle tracking velocimetry
+  - granular flow
+  - colour identification
+  - multi-object tracking
+# TODO(paper): replace the arXiv placeholder once the preprint is posted; add the journal once accepted.
+preferred-citation:
+  type: article
+  title: "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
+  authors:
+    - family-names: Thurairajah
+      given-names: Kaveeshan
+      email: kavee@thurairajah.org
+      affiliation: "University of Waterloo"
+    - family-names: Pan
+      given-names: Zhao
+      affiliation: "University of Waterloo"
+  status: preprint
+  identifiers:
+    - type: other
+      value: "arXiv:XXXX.XXXXX"
+      description: "arXiv preprint (placeholder)"

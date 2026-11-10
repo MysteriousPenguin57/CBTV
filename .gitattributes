@@ -1,0 +1,6 @@
+# Test fixtures and example data are compared byte for byte: store them exactly as they are.
+tests/fixtures/** -text
+examples/** -text
+*.mp4 binary
+*.mkv binary
+*.avi binary

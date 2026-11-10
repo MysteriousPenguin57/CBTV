@@ -1,0 +1,10 @@
+# Only the package goes into the image (see Dockerfile COPY lines); keep the build context small.
+*
+!pyproject.toml
+!README.md
+!LICENSE
+!cbtv/
+!run_cbtv.py
+!cbtv_clean.py
+!render_states.py
+**/__pycache__

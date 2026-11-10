@@ -1,0 +1,14 @@
+# CBTV core requirements (kept in sync with pyproject.toml [project.dependencies]).
+# Preferred: `pip install .` (or `pip install ".[gpu]"`), which reads pyproject.toml.
+numpy>=2,<3
+scipy
+opencv-python>=4.10,<6
+scikit-image   # peak_local_max (cbtv/detect, ws_multi_vote preset), blob_log (cbtv/log_detect.py)
+tqdm
+
+# optional: GPU acceleration -> pip install ".[gpu]" (CUDA 12), or pick the build for your CUDA
+# cupy-cuda12x
+# cupy-cuda11x
+
+# optional: neural detection preset (--detector cellpose) -> pip install ".[cellpose]"
+# cellpose

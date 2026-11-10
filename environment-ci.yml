@@ -1,0 +1,32 @@
+# Conda environment reproducing the CPU/GPU test environment (2026-10-05; Windows, CUDA 12.9 components from
+# conda-forge for cupy-cuda12x). Python packages come from requirements-lock.txt.
+#   conda env create -p <env> -f environment-ci.yml
+#   set PYTHONNOUSERSITE=1 & set CUDA_PATH=<env>\Library
+#   <env>\python -m pip install -e . --no-deps && <env>\python -m pip check
+# The CUDA packages are Windows builds (cuda-crt-dev_win-64 etc.); on Linux drop the *_win-64 entries.
+name: cbtv-ci
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pip
+  - cuda-cudart=12.9.79
+  - cuda-cudart-dev=12.9.79
+  - cuda-cudart-dev_win-64=12.9.79
+  - cuda-cudart-static_win-64=12.9.79
+  - cuda-nvrtc=12.9.86
+  - cuda-nvrtc-dev=12.9.86
+  - cuda-cccl=12.9.27
+  - cuda-crt-dev_win-64=12.9.86
+  - libcublas=12.9.2.10
+  - libcufft=11.4.1.4
+  - libcurand=10.3.10.19
+  - libcusolver=11.7.5.82
+  - libcusparse=12.5.10.65
+  - libnvjitlink=12.9.86
+  - pip:
+      - -r requirements-lock.txt
+      - cupy-cuda12x==13.6.0
+      - pytest
+      - pandas
+      - hypothesis

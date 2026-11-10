@@ -1,0 +1,145 @@
+name: CI
+# Linux CPU tests, lint, Docker image, demo notebook and fixture runs. Windows: ci-windows.yml. macOS: ci-macos.yml.
+# All workflows currently run by hand only (Actions > Run workflow).
+on:
+  workflow_dispatch:
+
+env:
+  CUDA_VISIBLE_DEVICES: "-1"
+  OPENCV_OPENCL_RUNTIME: disabled
+  PYTHONHASHSEED: "0"
+  MPLBACKEND: Agg
+  PYTHONIOENCODING: utf-8
+
+jobs:
+  cpu:
+    name: ${{ matrix.os }} / py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install
+        # pandas: imported by tests/ and tools/ but not declared anywhere
+        run: python -m pip install -r requirements.txt ".[test]"
+      - name: compileall, import, --help, CPU smoke (tools/ci/install_check.sh)
+        env:
+          SKIP_VENV: "1"
+        run: tools/ci/install_check.sh python "$RUNNER_TEMP/install_check"
+      - name: pytest (not gpu, not slow)
+        if: hashFiles('tests/**') != ''
+        # faulthandler_timeout: a test stuck > 300 s dumps every thread's stack (hang diagnosis);
+        # -v on macOS so the log shows which test is running.
+        run: >-
+          python -m pytest ${{ runner.os == 'macOS' && '-v' || '-q' }} -m "not gpu and not slow" -p no:cacheprovider
+          --durations=10 -o faulthandler_timeout=300
+
+  # ruff + lenient mypy (config in pyproject.toml; same versions as .pre-commit-config.yaml).
+  lint:
+    name: ruff + mypy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      # mypy needs numpy/opencv installed, otherwise ignore_missing_imports turns their types into Any
+      # and real errors stay invisible on Linux.
+      - run: python -m pip install -r requirements.txt ruff==0.16.10 mypy==2.4.0
+      - name: ruff check
+        run: ruff check --output-format github .
+      - name: mypy (lenient)
+        run: mypy
+
+  # CPU Docker image; the fixture tutorial run inside it must reproduce the bt golden byte for byte.
+  docker:
+    name: docker image + fixture parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: build
+        run: docker build -t cbtv:ci .
+      - name: cbtv --version / --help in the image
+        run: docker run --rm cbtv:ci --version && docker run --rm cbtv:ci --help > /dev/null
+      - name: fixture tutorial in the container (primary60, --gpu 0, preset bt)
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/data" cbtv:ci \
+            tests/fixtures/primary60/clip.mp4 --detections-csv tests/fixtures/primary60/detections.csv \
+            --gpu 0 --output-dir docker_out
+          cmp docker_out/tracks.csv tests/fixtures/primary60/golden_gpu_tracks_bt.csv
+          echo "tracks.csv byte-identical to golden_gpu_tracks_bt.csv"
+
+  # The demo notebook must be committed without outputs and must execute on CPU.
+  notebook:
+    name: demo notebook (nbconvert --execute)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: python -m pip install . pandas matplotlib nbconvert nbclient ipykernel nbstripout
+      - name: outputs stripped (nbstripout --verify)
+        run: nbstripout --verify examples/cbtv_demo.ipynb
+      - name: execute
+        working-directory: examples
+        run: jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=900 --output "$RUNNER_TEMP/cbtv_demo.out.ipynb" cbtv_demo.ipynb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cbtv-demo-executed
+          path: ${{ runner.temp }}/cbtv_demo.out.ipynb
+
+  # The CPU-vs-golden fixture runs (marked slow) take ~12 min on 4 cores, so they get one job of their own
+  # instead of blowing the < 10 min budget of every matrix cell.
+  slow-parity:
+    name: ${{ matrix.os }} / py3.11 / slow fixture parity
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]  # Windows -> ci-windows.yml, macOS -> ci-macos.yml
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install
+        run: python -m pip install -r requirements.txt ".[test]"
+      - name: decode probe (OpenCV backend + first-frame hashes per fixture clip)
+        run: python tools/ci/frame_probe.py
+      - name: pytest (slow, not gpu)
+        run: >-
+          python -m pytest ${{ runner.os == 'macOS' && '-v' || '-q' }} -m "slow and not gpu" -p no:cacheprovider
+          --durations=10 -o faulthandler_timeout=600
+      - name: parity report (byte-identical / ids-only / different per fixture), on failure
+        if: failure()
+        run: python tools/ci/parity_report.py "$RUNNER_TEMP/parity" --summary "$GITHUB_STEP_SUMMARY"
+      - name: upload the CPU runs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parity-${{ matrix.os }}
+          path: ${{ runner.temp }}/parity

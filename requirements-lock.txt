@@ -1,0 +1,15 @@
+# Exact, pip-resolvable environment for reproducing the fixture goldens (tests/fixtures/*/golden_gpu_tracks*.csv).
+# Install in a clean environment (no user site-packages):
+#   PYTHONNOUSERSITE=1 python -m pip install -r requirements-lock.txt && python -m pip install -e . --no-deps
+#   python -m pip check
+# The machine that made the reference outputs (Windows 11, Python 3.13.5, RTX 3060) ran numpy 2.4.4 with
+# opencv-contrib-python 4.12.0.88, but opencv 4.12.0.88 declares numpy<2.3, so that pair does not resolve with pip.
+# This lock pins numpy 2.2.6, which gave byte-identical fixture outputs; opencv-python 4.12.0.88 ships the cv2 core
+# modules CBTV uses. OpenCV 5.0 was also byte-identical on the fixtures.
+numpy==2.2.6
+scipy==1.17.1
+opencv-python==4.12.0.88
+scikit-image==0.25.0
+matplotlib==3.10.0
+tqdm==4.67.3
+# GPU (optional): cupy-cuda12x==13.6.0, which needs a CUDA 12 runtime (see docs/user_guide.md, "Exact reproduction").

@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+*.mp4
+*.zip
+*.pdf
+runs/
+out/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+debug_hybrid/
+site/
+tutorial_out/
+docker_out/
+examples/demo_out/
+examples/my_out/
+# the regression fixture clips are part of the repository
+!tests/fixtures/**/clip.mp4
+results/
+.hypothesis/
+RELEASE_NOTES_FOR_KAVEE.md

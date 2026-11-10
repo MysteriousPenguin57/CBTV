@@ -1,0 +1,56 @@
+# DRAFT conda-forge recipe for CBTV. Not yet on conda-forge: before submitting to staged-recipes,
+# point `source` at the release sdist (url + sha256) and set the version from the tag.
+{% set name = "cbtv" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+  # url: https://pypi.org/packages/source/c/cbtv/cbtv-{{ version }}.tar.gz
+  # sha256: <fill in at release>
+
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  entry_points:
+    - cbtv = run_cbtv:main
+
+requirements:
+  host:
+    - python >=3.10
+    - pip
+    - setuptools >=61
+  run:
+    - python >=3.10
+    - numpy >=2,<3
+    - scipy
+    # pyproject asks for the opencv-python wheel; conda-forge's equivalent is py-opencv / opencv
+    - py-opencv >=4.10,<6
+    - scikit-image
+    - tqdm
+  run_constrained:
+    # optional GPU acceleration (pip extra [gpu]): the user installs a CuPy built for their CUDA
+    - cupy >=13
+
+test:
+  imports:
+    - cbtv
+    - cbtv.detect
+    - run_cbtv
+  commands:
+    - cbtv --version
+    - cbtv --help
+
+about:
+  home: https://github.com/MysteriousPenguin57/CBTV
+  summary: "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
+  license: BSD-3-Clause
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - MysteriousPenguin57
