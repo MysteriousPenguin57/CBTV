@@ -113,6 +113,9 @@ This detects particles with the default detector (`ws_multi_vote`) and tracks th
 Set `--r-min` and `--r-max` to bracket the particle radii in your video, in pixels; a wrong radius range is the most
 common cause of poor results. Check the settings on the first 50 frames first (`--max-frames 50`), and look at
 `overlay.mp4` to see whether the particles are detected.
+Two further settings given in pixels, `--max-dist` (default 20) and `--piv-ambiguity-disc` (default 3), are passed
+with `--extra` and should be scaled with the image in the same way: at twice the image scale, use
+`--r-min 12 --r-max 20 --extra "--max-dist 40 --piv-ambiguity-disc 6"`.
 
 If you have your own detections, give them as a CSV file with one row per detected particle:
 
@@ -194,7 +197,7 @@ If you use CBTV, please cite the paper:
 
 and the version of the software you used:
 
-> K. Thurairajah, CBTV (version 1.0.0), Zenodo, doi:10.5281/zenodo.XXXXXXX.
+> K. Thurairajah, CBTV (version 1.0.1), Zenodo, doi:10.5281/zenodo.XXXXXXX.
 
 The same information is in [CITATION.cff](CITATION.cff), from which GitHub shows a "Cite this repository" entry.
 

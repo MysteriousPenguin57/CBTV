@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cbtv"
-version = "1.0.0"
+version = "1.0.1"
 description = "CBTV: Colour Bean Tracking Velocimetry for Dense Granular Flows"
 readme = "README.md"
 license = { text = "BSD-3-Clause" }

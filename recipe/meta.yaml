@@ -1,7 +1,7 @@
 # DRAFT conda-forge recipe for CBTV. Not yet on conda-forge: before submitting to staged-recipes,
 # point `source` at the release sdist (url + sha256) and set the version from the tag.
 {% set name = "cbtv" %}
-{% set version = "1.0.0" %}
+{% set version = "1.0.1" %}
 
 package:
   name: {{ name|lower }}

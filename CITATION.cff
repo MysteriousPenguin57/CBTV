@@ -7,7 +7,7 @@ authors:
     given-names: Kaveeshan
     email: kavee@thurairajah.org
     affiliation: "University of Waterloo"
-version: 1.0.0
+version: 1.0.1
 # TODO(release): replace with the Zenodo DOI minted for the v1.0.0 release.
 doi: 10.5281/zenodo.XXXXXXX
 license: BSD-3-Clause

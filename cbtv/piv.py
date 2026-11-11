@@ -87,7 +87,8 @@ def _subpixel_1d(cm1: float, c0: float, cp1: float) -> float:
 
 
 def peak_sharpness_to_sigma(corr_2d: np.ndarray, peak_y: int | np.integer, peak_x: int | np.integer,
-                            *, base_sigma: float = 2.0, max_sigma: float = 8.0) -> float:
+                            *, base_sigma: float = 2.0, max_sigma: float = 8.0,
+                            disc: int = 3) -> float:
     """Map correlation-peak confidence to a displacement uncertainty sigma.
 
     Confident match (high, UNAMBIGUOUS normalised peak) -> sigma near
@@ -96,6 +97,12 @@ def peak_sharpness_to_sigma(corr_2d: np.ndarray, peak_y: int | np.integer, peak_
     already in [-1, 1], so the peak HEIGHT is the primary confidence signal
     (more robust than curvature on smooth texture); a second-peak ratio adds
     the ambiguity penalty that matters on quasi-lattice regions.
+
+    disc (--piv-ambiguity-disc, px): half-width of the square around the main
+    peak excluded from the second-peak search. It is in pixels, so it must
+    scale with the image: the peak's width grows with the particle size, and a
+    disc narrower than the peak lets its own flank count as a second peak.
+    Default 3 = the original fixed value.
     """
     peak = float(corr_2d[peak_y, peak_x])
     if not np.isfinite(peak) or peak < 0.2:
@@ -104,8 +111,8 @@ def peak_sharpness_to_sigma(corr_2d: np.ndarray, peak_y: int | np.integer, peak_
     # Ambiguity: best correlation OUTSIDE a small disc around the main peak.
     h, w = corr_2d.shape
     cc = corr_2d.copy()
-    y0, y1 = max(0, peak_y - 3), min(h, peak_y + 4)
-    x0, x1 = max(0, peak_x - 3), min(w, peak_x + 4)
+    y0, y1 = max(0, peak_y - disc), min(h, peak_y + disc + 1)
+    x0, x1 = max(0, peak_x - disc), min(w, peak_x + disc + 1)
     cc[y0:y1, x0:x1] = -1.0
     second = float(cc.max())
     if second > 0.0:
@@ -165,6 +172,7 @@ def compute_dense_piv_field(gray_prev: np.ndarray, gray_curr: np.ndarray,
     overlap = float(getattr(args, "piv_step_overlap", 0.5))
     base_sigma = float(getattr(args, "piv_base_sigma", 2.0))
     max_sigma = float(getattr(args, "piv_max_sigma", 8.0))
+    disc = int(getattr(args, "piv_ambiguity_disc", 3))
 
     H, W = gray_prev.shape[:2]
     win = max(8, int(round(win_d * d_px)))
@@ -222,7 +230,8 @@ def compute_dense_piv_field(gray_prev: np.ndarray, gray_curr: np.ndarray,
             u_g[gi, gj] = (px + sub_x) - s + off_x
             v_g[gi, gj] = (py + sub_y) - s + off_y
             sig_g[gi, gj] = peak_sharpness_to_sigma(corr, py, px,
-                                                    base_sigma=base_sigma, max_sigma=max_sigma)
+                                                    base_sigma=base_sigma, max_sigma=max_sigma,
+                                                    disc=disc)
 
     x0 = xs[0]; y0 = ys[0]
     dx = (xs[1] - xs[0]) if gx > 1 else 1.0

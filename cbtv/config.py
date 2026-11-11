@@ -403,6 +403,11 @@ def build_parser():
                     help="PIV min displacement uncertainty (px) at a sharp peak -> alpha~1.")
     ap.add_argument("--piv-max-sigma", type=float, default=8.0,
                     help="PIV max displacement uncertainty (px) at a flat/ambiguous peak -> alpha~0.")
+    ap.add_argument("--piv-ambiguity-disc", type=int, default=3,
+                    help="PIV peak test: half-width (px) of the square around the correlation peak that is "
+                         "excluded when the second peak is sought. In pixels, so scale it with the image "
+                         "(e.g. 6 at twice the image scale); too small and the peak's own flank counts as "
+                         "a second peak and the confidence collapses [3].")
     # [Phase 5 Stage 3.1] PIV has a ~1-diameter displacement ceiling: below it
     # PIV is a major win (s4 HOTA +0.16), above it the texture decorrelates and
     # PIV mispredicts -> fragmentation (s8 regression). Gate PIV OFF when the
@@ -738,6 +743,8 @@ def validate_args(args):
             raise SystemExit("--cluster-min-size must be >= 3 (affine fit needs 3+ members).")
         if int(args.cluster_max_size) < int(args.cluster_min_size):
             raise SystemExit("--cluster-max-size must be >= --cluster-min-size.")
+    if int(getattr(args, "piv_ambiguity_disc", 3)) < 1:
+        raise SystemExit(f"--piv-ambiguity-disc must be >= 1 (got {args.piv_ambiguity_disc}).")
     if getattr(args, "boundary_margin", 20.0) < 0 or getattr(args, "boundary_miss_bonus", 6) < 0:
         raise SystemExit("--boundary-margin and --boundary-miss-bonus must be >= 0.")
     if getattr(args, "units", "px") == "d":

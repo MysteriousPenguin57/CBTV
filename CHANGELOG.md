@@ -4,6 +4,14 @@ All notable changes to CBTV are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-11-11
+
+### Added
+- `--piv-ambiguity-disc` (default 3 px): the half-width of the square around the PIV correlation peak that is
+  excluded when the second peak is sought. Before, the 3 px was fixed in the code. It is in pixels, so it should be
+  scaled with the image scale, like `--r-min`, `--r-max` and `--max-dist`. With the default, tracks are
+  byte-identical to 1.0.0.
+
 ## [1.0.0] - unreleased
 
 First public release. Until this release the code was developed in a private repository under the name
