@@ -106,9 +106,10 @@ In order of importance:
 1. **`--r-min` and `--r-max`.** Measure a few particle radii in an image editor and set the range to bracket them.
    The defaults (6 to 10 px) suit particles of about 12 to 20 px diameter. A wrong radius range is the most common
    cause of poor detection.
-   The settings given in pixels (`--r-min`, `--r-max`, and through `--extra` `--max-dist` and
-   `--piv-ambiguity-disc`) should be scaled with the image scale. At twice the image scale, for example, use
-   `--r-min 12 --r-max 20 --extra "--max-dist 40 --piv-ambiguity-disc 6"` instead of 6, 10, 20 and 3.
+   Settings given in pixels should be scaled with the image scale. For the paper's one flow rendered at twice the
+   image scale, four were doubled: `--r-min 12 --r-max 20 --extra "--max-dist 40 --piv-ambiguity-disc 6"` instead
+   of 6, 10, 20 and 3. Other pixel-valued settings, for example `--boundary-margin` and the kernel-recovery radii
+   (`--recovery-search-radius`, `--recovery-max-move`), were left at their defaults there.
 2. **`--detector`.** If detection looks weak in `overlay.mp4` (many particles without a green circle, or many false
    green circles), try the other detectors on a 50-frame test. On dense packings where particles touch, `cellpose` is
    usually the strongest.
@@ -118,10 +119,14 @@ In order of importance:
 4. **Advanced options (through `--extra`).** The tracker core has many more parameters: the cost weights
    `--w-dist/--w-color/--w-kernel`, the colour smoothing `--colour-ema` (0.3), the match gate `--match-gate-d` (1.1),
    the constellation budget `--cluster-cap-alpha` (0.324), the PIV settings, and others. The defaults are the
-   benchmarked configuration; change them only with a reason.
+   benchmarked configuration; change them only with a reason. Among the PIV settings, `--piv-ambiguity-disc`
+   (3 px) is the half-width of the square around the correlation peak that is excluded when the second peak is sought.
+   Scale it with the image (6 at twice the image scale): a square narrower than the peak lets the peak's own flank
+   count as a second peak, and the PIV confidence collapses.
 
 **What your video needs.** Roughly circular particles in a small number of distinct colours (the colours carry the
-identity information), reasonably steady illumination, and a particle radius of about 4 to 15 px.
+identity information), reasonably steady illumination, and a particle radius of about 4 to 15 px with the default
+settings. For larger particles, scale the pixel-valued settings as described in "Tuning for your video" above.
 
 ## Bright background (`--input-polarity`)
 
@@ -177,7 +182,6 @@ preset turns on `--coast-predict flow`, `--exit-kill 1` and `--color-source trac
 | `--confirm-hits` | `1` | K > 1: a new track is tentative until K consecutive matches, and a tentative track that misses is dropped. Confirmed tracks keep their first frames (output is delayed by K-1 frames) |
 | `--confirm-hits-entry` | `0` | K for tracks born in entry bands (0 = `--confirm-hits`) |
 | `--boundary-margin` / `--boundary-miss-bonus` | `20` / `6` | the edge band (px) and its extra miss tolerance |
-| `--piv-ambiguity-disc` | `3` | PIV peak test: half-width (px) of the square around the correlation peak excluded when the second peak is sought. Scale it with the image (for example `6` at twice the image scale): a square narrower than the peak lets the peak's own flank count as a second peak, and the PIV confidence collapses |
 | `--units d --d-p PX` | `px` | read the explicitly given `--max-dist`, `--boundary-margin`, `--recovery-search-radius` and `--recovery-max-move` in particle diameters |
 | `--row-tags` | `0` | `1`: add `state, coast_n, region` columns and write `tracks_meta.csv` (see below) |
 | `--color-source` | `frame` | `track`: the colour term uses the colour stored at the last match; `min`: the smaller of the two per pair (see "Fast particles" below) |

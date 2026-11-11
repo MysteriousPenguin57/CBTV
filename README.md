@@ -156,9 +156,11 @@ described in [docs/api_python.md](docs/api_python.md).
 
 ## Reproducing the paper's configuration
 
-All CBTV results in the paper use the default preset, `bt`. The configuration as first frozen for the paper is
-available as `--preset ship-v4`. Every random draw comes from `--seed` (default 0), so the same inputs and seed give
-the same `tracks.csv`.
+All CBTV results in the paper use the default preset, `bt`, except that on the one flow rendered at twice the image
+scale of the others, four pixel-valued settings were doubled:
+`--r-min 12 --r-max 20 --extra "--max-dist 40 --piv-ambiguity-disc 6"`. The configuration as first frozen for the
+paper is available as `--preset ship-v4`. Every random draw comes from `--seed` (default 0), so the same inputs and
+seed give the same `tracks.csv`.
 
 To reproduce the reference outputs in `tests/fixtures/` byte for byte, install the pinned environment into a new,
 empty environment:

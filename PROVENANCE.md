@@ -10,7 +10,9 @@ byte-identical `tracks.csv` before and after it.
 The numbers in the paper were produced on GPU with the `ship-v4` and `bt` presets. The tracker code (`cbtv/`,
 `run_cbtv.py`) is the code that produced them, apart from the rename and two fixes made for the public release
 (see `CHANGELOG.md`): the `--second-pass` option no longer crashes, and a CUDA installation that cannot compile
-kernels now falls back to the CPU. Neither changes the tracks of the two presets.
+kernels now falls back to the CPU. Neither changes the tracks of the two presets. Version 1.0.1 adds one option,
+`--piv-ambiguity-disc`, which makes a previously fixed 3 px setting of the PIV peak test adjustable; at its default
+of 3 it does not change the tracks.
 
 The example videos in `examples/` are renderings of the authors' discrete-element simulations, two of the flows in
 the paper, with the Cellpose detections that every tracker received in the paper's comparison.

@@ -8,7 +8,7 @@ authors:
     email: kavee@thurairajah.org
     affiliation: "University of Waterloo"
 version: 1.0.1
-# TODO(release): replace with the Zenodo DOI minted for the v1.0.0 release.
+# TODO(release): replace with the Zenodo DOI minted for the release of this version.
 doi: 10.5281/zenodo.XXXXXXX
 license: BSD-3-Clause
 repository-code: "https://github.com/MysteriousPenguin57/CBTV"
